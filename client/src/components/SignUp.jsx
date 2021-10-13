@@ -38,7 +38,7 @@ const SignUp=()=>{
         console.log(data);
         if(res.status===422||!data)
         {
-            window.alert("Registration Failed");
+            if(!window.alert("Registration Failed")) window.location.reload(); 
         }
         else
         {

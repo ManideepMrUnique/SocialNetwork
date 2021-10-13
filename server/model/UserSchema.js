@@ -34,7 +34,7 @@ userSchema.pre('save',async function(next){
     next();
 });
 
-userSchema.methods.generateAuthToken=async ()=>{
+userSchema.methods.generateAuthToken=async function(){
     try{
         let tokenT=jwt.sign({_id:this._id},"abcdefghijklmnopqrstuvwxyz");
         this.tokens=tokenT;

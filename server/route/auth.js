@@ -12,7 +12,7 @@ router.get('/',(req,res)=>{
 
 
 router.post('/register',async (req,res)=>{
-    console.log(req.body);
+    //console.log(req.body);
     const {email,username,password,phone}=req.body;
     if(!email||!username||!password||!phone)
     {
@@ -48,35 +48,34 @@ router.post('/login',async (req,res)=>{
     }
     else
     {
-        try
+        try{
+        const userLogin=await User.findOne({email:email});
+        if(!userLogin)
         {
-            const userLogin=await User.findOne({email:email});
-            if(!userLogin)
+               res.status(400).json({error:"User doesn't exist"});
+        }
+        const passMatch=await bcrypt.compare(password,userLogin.password);
+        if(!passMatch)
+        {
+             res.status(400).json({message:"Invalid Password"});
+        }
+        else
+        {
+            const token=await userLogin.generateAuthToken();
+            console.log(token);
+
+            res.cookie("jwtoken",token,
             {
-                res.status(400).json({error:"User doesn't exist"});
-            }
-            const passMatch=await bcrypt.compare(password,userLogin.password);
-
-            if(!passMatch)
-            {
-                res.status(400).json({message:"Invalid Password"});
-            }
-
-            // const token=await userLogin.generateAuthToken();
-            // console.log(token);
-
-            // res.cookie("jwtoken",token,
-            // {
-            //     expires:new Date(Date.now()+10000000),
-            //     httpOnly:true
-            // });
+                expires:new Date(Date.now()+10000000),
+                httpOnly:true
+            });
+            res.status(200).json({message:"Login Sucessful"});
+        }
         }
         catch(err)
         {
-            console.log("here");
             console.log(err);
         }
-        res.status(200).json({message:"Login Sucessful"});
     }
 });
 
